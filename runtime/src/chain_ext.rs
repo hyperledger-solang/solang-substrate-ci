@@ -35,6 +35,30 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 					.map_err(|_| DispatchError::Other("ChainExtension failed to call random"))?;
 			},
 
+			6 => {
+				let mut env = env.buf_in_buf_out();
+				let arg: [u8; 0xc0] = env.read_as()?;
+				let result = crate::bn128::add(&arg);
+				env.write(&result, false, None)
+					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+			},
+
+			7 => {
+				let mut env = env.buf_in_buf_out();
+				let arg: [u8; 0x80] = env.read_as()?;
+				let result = crate::bn128::mul(&arg);
+				env.write(&result, false, None)
+					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+			},
+
+			8 => {
+				let mut env = env.buf_in_buf_out();
+				let arg: [u8; 0x80] = env.read_as()?;
+				let result = crate::bn128::pairing(&arg).encode();
+				env.write(&result, false, None)
+					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+			},
+
 			_ => {
 				error!("Called an unregistered `func_id`: {:}", func_id);
 				return Err(DispatchError::Other("Unimplemented func_id"));

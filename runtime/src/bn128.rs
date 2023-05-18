@@ -1,5 +1,4 @@
 use crate::Vec;
-use sp_core::U256;
 
 /// Copy bytes from input to target.
 fn read_input(source: &[u8], target: &mut [u8], offset: usize) {
@@ -78,7 +77,7 @@ pub(crate) fn mul(input: &[u8]) -> [u8; 64] {
 	buf
 }
 
-fn pairing(input: &[u8]) -> bool {
+pub(crate) fn pairing(input: &[u8]) -> bool {
 	use bn::{pairing_batch, AffineG1, AffineG2, Fq, Fq2, Group, Gt, G1, G2};
 
 	if input.is_empty() {
