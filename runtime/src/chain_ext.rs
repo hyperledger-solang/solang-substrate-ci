@@ -8,7 +8,7 @@ use sp_core::crypto::UncheckedFrom;
 use sp_runtime::DispatchError;
 
 use super::Randomness;
-use crate::{mimc::mimc_sponge, Runtime};
+use crate::{mimc::mimc_feistel, Runtime};
 
 #[derive(Default)]
 pub struct FetchRandomExtension;
@@ -63,8 +63,8 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 			220 => {
 				let mut env = env.buf_in_buf_out();
 				let (x_l, x_r) = env.read_as::<([u8; 32], [u8; 32])>()?;
-				let result = mimc_sponge([0; 32].into(), [x_l.into(), x_r.into()]);
-				env.write(&(result[0].to_repr().0, result[1].to_repr().0).encode(), false, None)
+				let result = mimc_feistel([0; 32].into(), x_l.into(), x_r.into());
+				env.write(&(result.0.to_repr().0, result.1.to_repr().0).encode(), false, None)
 					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
 			},
 

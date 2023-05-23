@@ -1,7 +1,7 @@
 /// MiMC Sponge implementation
 ///
 /// Source: https://github.com/hideyour-cash/hideyour-cash/tree/main/packages/contract-libraries/near_mimc
-use ff_wasm_unknown_unknown::{Field, PrimeField};
+use ff_wasm_unknown_unknown::PrimeField;
 
 #[derive(PrimeField)]
 #[PrimeFieldModulus = "21888242871839275222246405745257275088548364400416034343698204186575808495617"]
@@ -21,28 +21,7 @@ impl From<[u8; 32]> for Fp {
 	}
 }
 
-const INPUTS: usize = 2;
-const OUTPUTS: usize = 2;
-
-pub(super) fn mimc_sponge(k: Fp, inputs: [Fp; INPUTS]) -> [Fp; OUTPUTS] {
-	let mut hash = (Fp::zero(), Fp::zero());
-
-	for &input in inputs.iter() {
-		hash = mimc_feistel(k, hash.0 + input, hash.1);
-	}
-
-	let mut outputs: [Fp; OUTPUTS] = [Fp::zero(); OUTPUTS];
-	outputs[0] = hash.0;
-
-	for i in 1..OUTPUTS {
-		hash = mimc_feistel(k, hash.0, hash.1);
-		outputs[i] = hash.0;
-	}
-
-	outputs
-}
-
-fn mimc_feistel(k: Fp, left: Fp, right: Fp) -> (Fp, Fp) {
+pub(super) fn mimc_feistel(k: Fp, left: Fp, right: Fp) -> (Fp, Fp) {
 	let mut x_left = left;
 	let mut x_right = right;
 

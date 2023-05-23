@@ -125,11 +125,5 @@ pub(crate) fn pairing(input: &[u8]) -> bool {
 		vals.push((a, b));
 	}
 
-	let mul = pairing_batch(&vals);
-
-	if mul == Gt::one() {
-		true
-	} else {
-		false
-	}
+	pairing_batch(&vals) == Gt::one()
 }
