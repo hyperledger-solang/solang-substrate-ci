@@ -50,6 +50,7 @@ pallet-contracts-primitives = { git = "https://github.com/paritytech/substrate",
 # Chain extension
 pallet-assets-chain-extension = { git = "https://github.com/727-Ventures/pallet-assets-chain-extension", default-features = false, features = ["substrate"], branch = "polkadot-v0.9.42"  }
 bn = { package = "substrate-bn", version = "0.6", default-features = false }
+ff_wasm_unknown_unknown = { features = ["derive"], version = "0.12.2" }
 
 [build-dependencies]
 substrate-wasm-builder =  { git = "https://github.com/paritytech/substrate", package = "substrate-wasm-builder", optional = true, branch = "polkadot-v0.9.42" }

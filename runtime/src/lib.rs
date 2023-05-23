@@ -4,6 +4,7 @@
 
 mod bn128;
 mod chain_ext;
+mod mimc;
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
