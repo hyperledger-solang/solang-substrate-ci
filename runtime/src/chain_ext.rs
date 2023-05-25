@@ -49,15 +49,16 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 				let arg: [u8; 0x80] = env.read_as()?;
 				let result = crate::bn128::mul(&arg);
 				env.write(&result, false, None)
-					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 mul"))?;
 			},
 
 			8 => {
 				let mut env = env.buf_in_buf_out();
-				let arg: [u8; 0x80] = env.read_as()?;
+				let arg: [u8; 0x300] = env.read_as()?;
 				let result = crate::bn128::pairing(&arg).encode();
-				env.write(&result, false, None)
-					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+				env.write(&result, false, None).map_err(|_| {
+					DispatchError::Other("ChainExtension failed to call bn128 pair")
+				})?;
 			},
 
 			220 => {
