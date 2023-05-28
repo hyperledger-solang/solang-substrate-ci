@@ -1,3 +1,4 @@
+use bn::{FieldError, GroupError};
 use codec::Encode;
 use ff_wasm_unknown_unknown::PrimeField;
 use frame_support::log::{debug, error};
@@ -10,6 +11,23 @@ use sp_runtime::DispatchError;
 use super::Randomness;
 use crate::{mimc::mimc_feistel, Runtime};
 
+pub(crate) enum InvalidArgument {
+	NotInField = 1,
+	NotOnCurve = 2,
+}
+
+impl From<FieldError> for InvalidArgument {
+	fn from(_: FieldError) -> Self {
+		Self::NotInField
+	}
+}
+
+impl From<GroupError> for InvalidArgument {
+	fn from(_: GroupError) -> Self {
+		Self::NotOnCurve
+	}
+}
+
 #[derive(Default)]
 pub struct FetchRandomExtension;
 
@@ -20,6 +38,7 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 	{
 		let func_id = env.func_id();
 		match func_id {
+			// ink! FetchRandom chain extension example
 			1101 => {
 				debug!(
 					target: "runtime",
@@ -28,45 +47,55 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 				);
 				let mut env = env.buf_in_buf_out();
 				let arg: [u8; 32] = env.read_as()?;
-				debug!(target: "runtime", "arg: {:?}", &arg);
 				let random_seed = crate::RandomnessCollectiveFlip::random(&arg).0;
 				let random_slice = random_seed.encode();
-				debug!(target: "runtime", "random_slice: {:?}", &random_slice);
 				env.write(&random_slice, false, None)
 					.map_err(|_| DispatchError::Other("ChainExtension failed to call random"))?;
 			},
 
+			// bn128 curve addition
 			6 => {
 				let mut env = env.buf_in_buf_out();
 				let arg: [u8; 0xc0] = env.read_as()?;
-				let result = crate::bn128::add(&arg);
-				env.write(&result, false, None)
-					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+				match crate::bn128::add(&arg) {
+					Ok(result) => env
+						.write(&result, false, None)
+						.map_err(|_| DispatchError::Other("output buffer too small"))?,
+					Err(reason) => return Ok(RetVal::Converging(reason as u32)),
+				}
 			},
 
+			// bn128 curve scalar multiplication
 			7 => {
 				let mut env = env.buf_in_buf_out();
 				let arg: [u8; 0x80] = env.read_as()?;
-				let result = crate::bn128::mul(&arg);
-				env.write(&result, false, None)
-					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 mul"))?;
+				match crate::bn128::mul(&arg) {
+					Ok(result) => env
+						.write(&result, false, None)
+						.map_err(|_| DispatchError::Other("output buffer too small"))?,
+					Err(reason) => return Ok(RetVal::Converging(reason as u32)),
+				}
 			},
 
+			// bn128 curve pairing
 			8 => {
 				let mut env = env.buf_in_buf_out();
 				let arg: [u8; 0x300] = env.read_as()?; // TOOD / FIXME: Hardcoded input size
-				let result = crate::bn128::pairing(&arg).encode();
-				env.write(&result, false, None).map_err(|_| {
-					DispatchError::Other("ChainExtension failed to call bn128 pair")
-				})?;
+				match crate::bn128::pairing(&arg) {
+					Ok(result) => env
+						.write(&result.encode(), false, None)
+						.map_err(|_| DispatchError::Other("output buffer too small"))?,
+					Err(reason) => return Ok(RetVal::Converging(reason as u32)),
+				}
 			},
 
+			// mimc sponge hasher
 			220 => {
 				let mut env = env.buf_in_buf_out();
 				let (x_l, x_r) = env.read_as::<([u8; 32], [u8; 32])>()?;
 				let result = mimc_feistel([0; 32].into(), x_l.into(), x_r.into());
 				env.write(&(result.0.to_repr().0, result.1.to_repr().0).encode(), false, None)
-					.map_err(|_| DispatchError::Other("ChainExtension failed to call bn128 add"))?;
+					.map_err(|_| DispatchError::Other("output buffer too small"))?;
 			},
 
 			_ => {
