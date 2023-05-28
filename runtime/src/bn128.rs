@@ -2,7 +2,7 @@
 ///
 /// Adpted from the frontier precompile:
 /// https://github.com/paritytech/frontier/blob/master/frame/evm/precompile/bn128/src/lib.rs
-use crate::Vec;
+use bn::{pairing_batch, AffineG1, AffineG2, Fq, Fq2, Group, Gt, G1, G2};
 
 /// Copy bytes from input to target.
 fn read_input(source: &[u8], target: &mut [u8], offset: usize) {
@@ -25,8 +25,6 @@ fn read_fr(input: &[u8], start_inx: usize) -> bn::Fr {
 }
 
 fn read_point(input: &[u8], start_inx: usize) -> bn::G1 {
-	use bn::{AffineG1, Fq, Group, G1};
-
 	let mut px_buf = [0u8; 32];
 	let mut py_buf = [0u8; 32];
 	read_input(input, &mut px_buf, start_inx);
@@ -43,62 +41,43 @@ fn read_point(input: &[u8], start_inx: usize) -> bn::G1 {
 	}
 }
 
-pub(crate) fn add(input: &[u8]) -> [u8; 64] {
-	use bn::AffineG1;
+fn write_point(output: &mut [u8; 64], point: AffineG1) {
+	let mut buf = [0; 32];
+	point.x().to_big_endian(&mut buf).expect("buffer size is 32; qed");
+	buf.reverse();
+	output[..32].copy_from_slice(&buf);
 
+	let mut buf = [0; 32];
+	point.y().to_big_endian(&mut buf).expect("buffer size is 32; qed");
+	buf.reverse();
+	output[32..].copy_from_slice(&buf);
+}
+
+pub(crate) fn add(input: &[u8]) -> [u8; 64] {
 	let p1 = read_point(input, 0);
 	let p2 = read_point(input, 64);
 
 	let mut output = [0u8; 64];
-	if let Some(sum) = AffineG1::from_jacobian(p1 + p2) {
+	if let Some(point) = AffineG1::from_jacobian(p1 + p2) {
 		// point not at infinity
-		let mut buf = [0; 32];
-		sum.x()
-			.to_big_endian(&mut buf)
-			.expect("Cannot fail since 0..32 is 32-byte length");
-		buf.reverse();
-		output[..32].copy_from_slice(&buf);
-
-		let mut buf = [0; 32];
-		sum.y()
-			.to_big_endian(&mut buf)
-			.expect("Cannot fail since 32..64 is 32-byte length");
-		buf.reverse();
-		output[32..].copy_from_slice(&buf);
+		write_point(&mut output, point);
 	}
-
 	output
 }
 
 pub(crate) fn mul(input: &[u8]) -> [u8; 64] {
-	use bn::AffineG1;
-
 	let p = read_point(input, 0);
 	let fr = read_fr(input, 64);
 
 	let mut output = [0u8; 64];
-	if let Some(sum) = AffineG1::from_jacobian(p * fr) {
+	if let Some(point) = AffineG1::from_jacobian(p * fr) {
 		// point not at infinity
-		let mut buf = [0; 32];
-		sum.x()
-			.to_big_endian(&mut buf)
-			.expect("Cannot fail since 0..32 is 32-byte length");
-		buf.reverse();
-		output[..32].copy_from_slice(&buf);
-
-		let mut buf = [0; 32];
-		sum.y()
-			.to_big_endian(&mut buf)
-			.expect("Cannot fail since 32..64 is 32-byte length");
-		buf.reverse();
-		output[32..].copy_from_slice(&buf);
+		write_point(&mut output, point)
 	}
 	output
 }
 
 pub(crate) fn pairing(input: &[u8]) -> bool {
-	use bn::{pairing_batch, AffineG1, AffineG2, Fq, Fq2, Group, Gt, G1, G2};
-
 	if input.is_empty() {
 		return true;
 	}
@@ -117,7 +96,7 @@ pub(crate) fn pairing(input: &[u8]) -> bool {
 		buf
 	};
 
-	let mut vals = Vec::new();
+	let mut vals = crate::Vec::new();
 	for idx in 0..elements {
 		let a_x = Fq::from_slice(&read_buf(idx, 0)).expect("Invalid a argument x coordinate");
 
