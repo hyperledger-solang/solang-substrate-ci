@@ -13,6 +13,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "addchain"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b2e69442aa5628ea6951fa33e24efe8313f4321a91bd729fc2f75bdfc858570"
+dependencies = [
+ "num-bigint 0.3.3",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -994,12 +1005,11 @@ dependencies = [
 name = "contracts-node-runtime"
 version = "0.25.1"
 dependencies = [
+ "ff_wasm_unknown_unknown",
  "frame-executive",
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
- "pallet-assets",
- "pallet-assets-chain-extension",
  "pallet-authorship",
  "pallet-balances",
  "pallet-contracts",
@@ -1490,7 +1500,7 @@ dependencies = [
  "asn1-rs 0.3.1",
  "displaydoc",
  "nom",
- "num-bigint",
+ "num-bigint 0.4.3",
  "num-traits",
  "rusticata-macros",
 ]
@@ -1504,7 +1514,7 @@ dependencies = [
  "asn1-rs 0.5.2",
  "displaydoc",
  "nom",
- "num-bigint",
+ "num-bigint 0.4.3",
  "num-traits",
  "rusticata-macros",
 ]
@@ -1931,6 +1941,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ded41244b729663b1e574f1b4fb731469f69f79c17667b5d776b16cda0479449"
 dependencies = [
  "rand_core 0.6.4",
+ "subtle",
+]
+
+[[package]]
+name = "ff_derive_wasm_unknown_unknown"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14f22a8daa9c9bceb4706d77adfdfa18efda91f8cf688bf4b5bdf11e21339f76"
+dependencies = [
+ "addchain",
+ "cfg-if",
+ "num-bigint 0.3.3",
+ "num-integer",
+ "num-traits",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "ff_wasm_unknown_unknown"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e61c506e39f5c84c05d57ba71c9b3e5a70b46080d3ec732a2001ee64a8d57040"
+dependencies = [
+ "bitvec",
+ "byteorder",
+ "ff_derive_wasm_unknown_unknown",
  "subtle",
 ]
 
@@ -4157,6 +4195,17 @@ checksum = "61807f77802ff30975e01f4f071c8ba10c022052f98b3294119f3e615d13e5be"
 
 [[package]]
 name = "num-bigint"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f6f7833f2cbf2360a6cfd58cd41a53aa7a90bd4c202f5b1c7dd2ed73c57b2c3"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-bigint"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f93ab6289c7b344a8a9f60f88d80aa20032336fe78da341afc91c8a2341fc75f"
@@ -4202,7 +4251,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0638a1c9d0a3c0914158145bc76cff373a75a627e6ecbfb71cbe6f453a5a19b0"
 dependencies = [
  "autocfg",
- "num-bigint",
+ "num-bigint 0.4.3",
  "num-integer",
  "num-traits",
 ]
@@ -4224,44 +4273,6 @@ checksum = "0fac9e2da13b5eb447a6ce3d392f23a29d8694bff781bf03a16cd9ac8697593b"
 dependencies = [
  "hermit-abi 0.2.6",
  "libc",
-]
-
-[[package]]
-name = "obce"
-version = "0.1.0"
-source = "git+https://github.com/727-Ventures/obce?branch=polkadot-v0.9.42#f28246b251ce478f57ded7caf3e2e44e4dfc55fe"
-dependencies = [
- "frame-support",
- "frame-system",
- "obce-macro",
- "pallet-contracts",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "obce-codegen"
-version = "0.1.0"
-source = "git+https://github.com/727-Ventures/obce?branch=polkadot-v0.9.42#f28246b251ce478f57ded7caf3e2e44e4dfc55fe"
-dependencies = [
- "blake2",
- "darling",
- "itertools",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
- "tuple",
-]
-
-[[package]]
-name = "obce-macro"
-version = "0.1.0"
-source = "git+https://github.com/727-Ventures/obce?branch=polkadot-v0.9.42#f28246b251ce478f57ded7caf3e2e44e4dfc55fe"
-dependencies = [
- "obce-codegen",
 ]
 
 [[package]]
@@ -4357,32 +4368,6 @@ checksum = "a1914cd452d8fccd6f9db48147b29fd4ae05bea9dc5d9ad578509f72415de282"
 dependencies = [
  "cfg-if",
  "libm 0.1.4",
-]
-
-[[package]]
-name = "pallet-assets"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.42#bca8a29dbde0009e80c4c4737be47abff6b3e2c2"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-assets-chain-extension"
-version = "0.1.1"
-source = "git+https://github.com/727-Ventures/pallet-assets-chain-extension?branch=polkadot-v0.9.42#8dc9f38d667b08d12db2c008a60a5571de59edf7"
-dependencies = [
- "obce",
- "pallet-assets",
- "parity-scale-codec",
- "scale-info",
 ]
 
 [[package]]
@@ -5901,7 +5886,7 @@ dependencies = [
  "fork-tree",
  "futures",
  "log",
- "num-bigint",
+ "num-bigint 0.4.3",
  "num-rational",
  "num-traits",
  "parity-scale-codec",
@@ -8500,16 +8485,6 @@ name = "tt-call"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4f195fd851901624eee5a58c4bb2b4f06399148fcd0ed336e6f1cb60a9881df"
-
-[[package]]
-name = "tuple"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39a40ba241047e1174c927dc5f61c141a166b938d61a2ff61838441368cc7d0e"
-dependencies = [
- "num-traits",
- "serde",
-]
 
 [[package]]
 name = "turn"
