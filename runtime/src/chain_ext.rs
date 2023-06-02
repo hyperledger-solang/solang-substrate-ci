@@ -2,6 +2,7 @@ use bn::{FieldError, GroupError};
 use codec::Encode;
 use ff_wasm_unknown_unknown::PrimeField;
 use frame_support::log::{debug, error};
+use frame_support::weights::Weight;
 use pallet_contracts::chain_extension::{
 	ChainExtension, Environment, Ext, InitState, RetVal, SysConfig,
 };
@@ -32,7 +33,7 @@ impl From<GroupError> for InvalidArgument {
 pub struct FetchRandomExtension;
 
 impl ChainExtension<Runtime> for FetchRandomExtension {
-	fn call<E: Ext>(&mut self, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
+	fn call<E: Ext>(&mut self, mut env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
 	where
 		<E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
 	{
@@ -55,8 +56,11 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 
 			// bn128 curve addition
 			6 => {
+				env.charge_weight(Weight::from_parts(7_940_000, 0))?; // Roughly
+
 				let mut env = env.buf_in_buf_out();
-				let arg: [u8; 0xc0] = env.read_as()?;
+				let arg: [u8; 128] = env.read_as()?;
+
 				match crate::bn128::add(&arg) {
 					Ok(result) => env
 						.write(&result, false, None)
@@ -67,8 +71,11 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 
 			// bn128 curve scalar multiplication
 			7 => {
+				env.charge_weight(Weight::from_parts(168_074_000, 0))?; // Roughly
+
 				let mut env = env.buf_in_buf_out();
-				let arg: [u8; 0x80] = env.read_as()?;
+				let arg: [u8; 96] = env.read_as()?;
+
 				match crate::bn128::mul(&arg) {
 					Ok(result) => env
 						.write(&result, false, None)
@@ -79,8 +86,11 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 
 			// bn128 curve pairing
 			8 => {
+				env.charge_weight(Weight::from_parts(6_080_874_000, 0))?; // Roughly
+
 				let mut env = env.buf_in_buf_out();
 				let arg: [u8; 0x300] = env.read_as()?; // TOOD / FIXME: Hardcoded input size
+
 				match crate::bn128::pairing(&arg) {
 					Ok(result) => env
 						.write(&result.encode(), false, None)
@@ -91,9 +101,12 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 
 			// mimc sponge hasher
 			220 => {
+				env.charge_weight(Weight::from_parts(28_890_000, 0))?; // Roughly
+
 				let mut env = env.buf_in_buf_out();
 				let (x_l, x_r) = env.read_as::<([u8; 32], [u8; 32])>()?;
-				let result = mimc_feistel([0; 32].into(), x_l.into(), x_r.into());
+
+				let result = mimc_feistel(x_l.into(), x_r.into());
 				env.write(&(result.0.to_repr().0, result.1.to_repr().0).encode(), false, None)
 					.map_err(|_| DispatchError::Other("output buffer too small"))?;
 			},

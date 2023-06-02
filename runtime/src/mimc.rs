@@ -21,12 +21,12 @@ impl From<[u8; 32]> for Fp {
 	}
 }
 
-pub(super) fn mimc_feistel(k: Fp, left: Fp, right: Fp) -> (Fp, Fp) {
+pub(super) fn mimc_feistel(left: Fp, right: Fp) -> (Fp, Fp) {
 	let mut x_left = left;
 	let mut x_right = right;
 
 	for &round_constant in ROUND_CONSTANTS.iter() {
-		let t = k + x_left + round_constant;
+		let t = ROUND_CONSTANTS[0] + x_left + round_constant;
 		let t2 = t * t;
 		let t5 = t2 * t2 * t;
 
