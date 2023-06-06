@@ -2,7 +2,7 @@ name: Build and push substrate ci image
 on:
   push:
     branches:
-      - bn128
+      - substrate-integration
   pull_request:
 
 jobs:
