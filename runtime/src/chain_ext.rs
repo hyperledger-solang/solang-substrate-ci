@@ -1,7 +1,6 @@
 use bn::{FieldError, GroupError};
 use codec::Encode;
 use ff_wasm_unknown_unknown::PrimeField;
-use frame_support::log::{debug, error};
 use frame_support::weights::Weight;
 use pallet_contracts::chain_extension::{
 	ChainExtension, Environment, Ext, InitState, RetVal, SysConfig,
@@ -41,11 +40,11 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 		match func_id {
 			// ink! FetchRandom chain extension example
 			1101 => {
-				debug!(
-					target: "runtime",
-					"[ChainExtension]|call|func_id:{:}",
-					func_id
-				);
+				//debug!(
+				//	target: "runtime",
+				//	"[ChainExtension]|call|func_id:{:}",
+				//	func_id
+				//);
 				let mut env = env.buf_in_buf_out();
 				let arg: [u8; 32] = env.read_as()?;
 				let random_seed = crate::RandomnessCollectiveFlip::random(&arg).0;
@@ -112,7 +111,7 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
 			},
 
 			_ => {
-				error!("Called an unregistered `func_id`: {:}", func_id);
+				//error!("Called an unregistered `func_id`: {:}", func_id);
 				return Err(DispatchError::Other("Unimplemented func_id"));
 			},
 		}
