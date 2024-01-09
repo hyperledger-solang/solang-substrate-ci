@@ -53,8 +53,8 @@ pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-assets = { workspace = true }
 
 # Chain extension
-bn = { package = "substrate-bn", version = "0.6", default-features = false }
-ff_wasm_unknown_unknown = { features = ["derive"], version = "0.12.2" }
+bn = { workspace = true, default-features = false }
+ff_wasm_unknown_unknown = { workspace = true, features = ["derive"] }
 
 # Used for the node template's RPCs
 frame-system-rpc-runtime-api = { workspace = true }

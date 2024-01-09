@@ -1446,6 +1446,7 @@ dependencies = [
  "cumulus-primitives-core",
  "cumulus-primitives-timestamp",
  "cumulus-primitives-utility",
+ "ff_wasm_unknown_unknown",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
@@ -1490,6 +1491,7 @@ dependencies = [
  "staging-xcm",
  "staging-xcm-builder",
  "staging-xcm-executor",
+ "substrate-bn",
  "substrate-wasm-builder",
 ]
 

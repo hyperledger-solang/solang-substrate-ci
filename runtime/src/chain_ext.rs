@@ -8,8 +8,8 @@ use pallet_contracts::chain_extension::{
 use sp_core::crypto::UncheckedFrom;
 use sp_runtime::DispatchError;
 
-use super::Randomness;
 use crate::{mimc::mimc_feistel, Runtime};
+use frame_support::traits::Randomness;
 
 pub(crate) enum InvalidArgument {
 	NotInField = 1,

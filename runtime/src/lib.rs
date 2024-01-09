@@ -9,6 +9,10 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 mod assets_config;
 mod contracts_config;
 
+mod bn128;
+mod chain_ext;
+mod mimc;
+
 use frame_support::dispatch::DispatchClass;
 use frame_system::limits::{BlockLength, BlockWeights};
 use polkadot_runtime_common::SlowAdjustingFeeUpdate;

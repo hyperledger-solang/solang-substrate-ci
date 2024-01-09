@@ -76,6 +76,10 @@ pallet-contracts-primitives = { workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-assets = { workspace = true }
 
+# Chain extension
+bn = { workspace = true, default-features = false }
+ff_wasm_unknown_unknown = { workspace = true, features = ["derive"] }
+
 [features]
 default = [
 	"std",
