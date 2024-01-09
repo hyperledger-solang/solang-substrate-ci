@@ -12,6 +12,10 @@ mod contracts_config;
 mod weights;
 mod xcm_config;
 
+mod bn128;
+mod chain_ext;
+mod mimc;
+
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;

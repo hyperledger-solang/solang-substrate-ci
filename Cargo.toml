@@ -130,3 +130,7 @@ cumulus-primitives-utility = { version = "0.3.0", default-features = false }
 cumulus-relay-chain-interface = { version = "0.3.0" }
 pallet-collator-selection = { version = "5.0.0", default-features = false }
 parachain-info = { package = "staging-parachain-info", version = "0.3.0", default-features = false }
+
+# Chain extension
+bn = { package = "substrate-bn", version = "0.6", default-features = false }
+ff_wasm_unknown_unknown = { features = ["derive"], version = "0.12.2" }
